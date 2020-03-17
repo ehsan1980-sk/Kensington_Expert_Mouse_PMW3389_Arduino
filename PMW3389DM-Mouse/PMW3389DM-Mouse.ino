@@ -270,20 +270,18 @@ void check_button_state()
   
   lastButtonCheck = curTime;
     
-  // Fast Debounce (works with 0 latency most of the time)
+  // Debounce
   for(int i=0;i < NUMBTN ; i++)
   {
     int btn_state = digitalRead(Btn_pins[i]);
     Btn_buffers[i] = Btn_buffers[i] << 1 | btn_state; 
 
-    if(!Btns[i] && Btn_buffers[i] == 0xFE)  // button pressed for the first time
+    if(!Btns[i] && Btn_buffers[i] == 0x00)  // button press stabilized
     {
       MOUSE_PRESS(Btn_keys[i]);
       Btns[i] = true;
     }
-    else if( (Btns[i] && Btn_buffers[i] == 0x01) // button released after stabilized press
-            // force release when consequent off state (for the DEBOUNCE time) is detected 
-            || (Btns[i] && Btn_buffers[i] == 0xFF) ) 
+    else if(Btns[i] && Btn_buffers[i] == 0xFF) // button release stabilized
     {
       MOUSE_RELEASE(Btn_keys[i]);
       Btns[i] = false;
