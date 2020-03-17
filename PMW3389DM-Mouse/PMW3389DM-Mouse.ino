@@ -20,7 +20,7 @@
 
 // Configurations
 // The default CPI value should be in between 100 -- 12000
-#define CPI       1200
+#define CPI       800
 #define DEBOUNCE  10   //unit = ms.
 
 //Set this to a pin your buttons are attached
