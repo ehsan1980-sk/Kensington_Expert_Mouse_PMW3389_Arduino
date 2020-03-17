@@ -1,6 +1,6 @@
 // Uncomment this line to activate an advanced mouse mode
 // Need to install AdvMouse library (copy /library/AdvMouse to the Arduino libraries)
-#define ADVANCE_MODE
+//#define ADVANCE_MODE
 
 
 #include <SPI.h>
