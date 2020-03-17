@@ -24,9 +24,11 @@
 #define DEBOUNCE  10   //unit = ms.
 
 //Set this to a pin your buttons are attached
-#define NUMBTN   2 
-#define Btn1_Pin 1  // left button
+#define NUMBTN   4
+#define Btn1_Pin 3  // left button
 #define Btn2_Pin 0  // right button
+#define Btn4_Pin 2  // middle button
+#define Btn8_Pin 1  // back button
 
 // Registers
 #define Product_ID  0x00
@@ -86,10 +88,10 @@
 const int ncs = 10;  // This is the SPI "slave select" pin that the sensor is hooked up to
 const int reset = 8; // Optional
 
-int Btn_pins[NUMBTN] = { Btn1_Pin, Btn2_Pin };
-bool Btns[NUMBTN] = {false, false};      // button state indicator
-uint8_t Btn_buffers[NUMBTN] = {0xFF, 0xFF}; // button debounce buffer  
-char Btn_keys[NUMBTN] = { MOUSE_LEFT, MOUSE_RIGHT };
+int Btn_pins[NUMBTN] = { Btn1_Pin, Btn2_Pin, Btn4_Pin, Btn8_Pin };
+bool Btns[NUMBTN] = {false, false, false, false};      // button state indicator
+uint8_t Btn_buffers[NUMBTN] = {0xFF, 0xFF, 0xFF, 0xFF}; // button debounce buffer
+char Btn_keys[NUMBTN] = { MOUSE_LEFT, MOUSE_RIGHT, MOUSE_MIDDLE, MOUSE_BACK };
 
 byte initComplete = 0;
 bool inBurst = false;   // in busrt mode
@@ -112,6 +114,8 @@ void setup() {
   
   pinMode(Btn1_Pin, INPUT_PULLUP);
   pinMode(Btn2_Pin, INPUT_PULLUP);
+  pinMode(Btn4_Pin, INPUT_PULLUP);
+  pinMode(Btn8_Pin, INPUT_PULLUP);
   
   SPI.begin();
   SPI.setDataMode(SPI_MODE3);
