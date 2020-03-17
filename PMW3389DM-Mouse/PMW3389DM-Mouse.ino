@@ -320,18 +320,19 @@ void dispRegisters(void) {
 
 void loop() {
   byte burstBuffer[12];
-  unsigned long elapsed = micros() - lastTS;
+  unsigned long curTime = micros();
+  unsigned long elapsed = curTime - lastTS;
 
   check_button_state();
 
   if(!inBurst)
   {
     adns_write_reg(Motion_Burst, 0x00); // start burst mode
-    lastTS = micros();
+    lastTS = curTime;
     inBurst = true;
   }
   
-  if(elapsed > 870)  // polling interval : more than > 0.5 ms.
+  if(elapsed >= 1000)  // polling interval : more than > 0.5 ms.
   {
     adns_com_begin();
     SPI.beginTransaction(SPISettings(4000000, MSBFIRST, SPI_MODE3));
@@ -408,7 +409,7 @@ void loop() {
       Serial.println(squal);
     }
     
-    lastTS = micros();
+    lastTS = curTime;
   }
 
   // command process routine
