@@ -98,6 +98,7 @@ int16_t dx, dy;
 
 unsigned long lastTS;
 unsigned long lastButtonCheck = 0;
+unsigned long curTime;
 
 //Be sure to add the SROM file into this sketch via "Sketch->Add File"
 extern const unsigned short firmware_length;
@@ -261,13 +262,13 @@ void check_button_state()
   if(initComplete != 9)
     return;
 
-  unsigned long elapsed = micros() - lastButtonCheck;
+  unsigned long elapsed = curTime - lastButtonCheck;
   
   // Update at a period of 1/8 of the DEBOUNCE time
   if(elapsed < (DEBOUNCE * 1000UL / 8))
     return;
   
-  lastButtonCheck = micros();
+  lastButtonCheck = curTime;
     
   // Fast Debounce (works with 0 latency most of the time)
   for(int i=0;i < NUMBTN ; i++)
@@ -320,7 +321,7 @@ void dispRegisters(void) {
 
 void loop() {
   byte burstBuffer[12];
-  unsigned long curTime = micros();
+  curTime = micros();
   unsigned long elapsed = curTime - lastTS;
 
   check_button_state();
