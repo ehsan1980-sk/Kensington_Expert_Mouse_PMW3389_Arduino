@@ -22,6 +22,7 @@
 // The default CPI value should be in between 100 -- 12000
 #define CPI       800
 #define DEBOUNCE  10   //unit = ms.
+#define NUMCPI 4
 
 //Set this to a pin your buttons are attached
 #define NUMBTN   4
@@ -92,6 +93,15 @@ int Btn_pins[NUMBTN] = { Btn1_Pin, Btn2_Pin, Btn4_Pin, Btn8_Pin };
 bool Btns[NUMBTN] = {false, false, false, false};      // button state indicator
 uint8_t Btn_buffers[NUMBTN] = {0xFF, 0xFF, 0xFF, 0xFF}; // button debounce buffer
 char Btn_keys[NUMBTN] = { MOUSE_LEFT, MOUSE_RIGHT, MOUSE_MIDDLE, MOUSE_BACK };
+
+unsigned long Cpis[NUMCPI] = { 400, 800, 1200, 1600 };
+struct CpiUpdater {
+  bool target_set;
+  bool updated;
+  uint8_t target_cpi_index;
+};
+
+CpiUpdater CpiUpdate = {false, false, 1}; // Default Cpis[1] = 800
 
 byte initComplete = 0;
 bool inBurst = false;   // in busrt mode
@@ -255,7 +265,7 @@ void performStartup(void) {
   adns_upload_firmware();
   delay(10);
 
-  setCPI(CPI);
+  setCPI(Cpis[CpiUpdate.target_cpi_index]);
   Serial.println("Optical Chip Initialized");
 }
 
@@ -291,6 +301,18 @@ void check_button_state()
       Btns[i] = false;
     }
     
+  }
+
+  // CPI switcher
+  if (Btns[1] /* MOUSE_RIGHT */ == true && Btns[2] /* MOUSE_MIDDLE */ == true) {
+    if (CpiUpdate.target_set != true) {
+      CpiUpdate.target_cpi_index = (CpiUpdate.target_cpi_index + 1) % NUMCPI;
+      CpiUpdate.target_set = true;
+      CpiUpdate.updated = false;
+    }
+  } else {
+    CpiUpdate.target_set = false;
+    CpiUpdate.updated = false;
   }
 }
 
@@ -413,6 +435,12 @@ void loop() {
     }
     
     lastTS = curTime;
+  }
+
+  // update CPI cycled from button combo
+  if (CpiUpdate.target_set == true && CpiUpdate.updated == false) {
+    setCPI(Cpis[CpiUpdate.target_cpi_index]);
+    CpiUpdate.updated = true;
   }
 
   // command process routine
