@@ -45,9 +45,8 @@
 #define Minimum_Raw_data  0x0A
 #define Shutter_Lower 0x0B
 #define Shutter_Upper 0x0C
-#define Ripple_Control 0x0D
-#define Resolution_L 0x0E
-#define Resolution_H 0x0F
+#define Control 0x0D
+#define Config1 0x0F
 #define Config2 0x10
 #define Angle_Tune  0x11
 #define Frame_Capture 0x12
@@ -64,27 +63,24 @@
 #define Observation 0x24
 #define Data_Out_Lower  0x25
 #define Data_Out_Upper  0x26
+#define Raw_Data_Dump 0x29
 #define SROM_ID 0x2A
 #define Min_SQ_Run  0x2B
 #define Raw_Data_Threshold  0x2C
-#define Control2 0x2D
-#define Config5_L 0x2E
-#define Config5_H 0x2F
+#define Config5 0x2F
 #define Power_Up_Reset  0x3A
 #define Shutdown  0x3B
 #define Inverse_Product_ID  0x3F
-#define LiftCutoff_Cal3  0x41
+#define LiftCutoff_Tune3  0x41
 #define Angle_Snap  0x42
-#define LiftCutoff_Cal1  0x4A
+#define LiftCutoff_Tune1  0x4A
 #define Motion_Burst  0x50
+#define LiftCutoff_Tune_Timeout 0x58
+#define LiftCutoff_Tune_Min_Length  0x5A
 #define SROM_Load_Burst 0x62
 #define Lift_Config 0x63
 #define Raw_Data_Burst  0x64
-#define LiftCutoff_Cal2  0x65
-#define LiftCutoff_Cal_Timeout 0x71
-#define LiftCutoff_Cal_Min_Length  0x72
-#define PWM_Period_Cnt 0x73
-#define PWM_Width_Cnt 0x74
+#define LiftCutoff_Tune2  0x65
 
 const int ncs = 10;  // This is the SPI "slave select" pin that the sensor is hooked up to
 const int reset = 8; // Optional
@@ -224,18 +220,17 @@ void adns_upload_firmware() {
 
 void setCPI(int cpi)
 {
-  unsigned cpival = cpi / 50;
+  int cpival = constrain((cpi/100)-1, 0, 0x77); // limits to 0--119 
 
   
   adns_com_begin();
-  adns_write_reg(Resolution_L, (cpival & 0xFF));
-  adns_write_reg(Resolution_H, ((cpival >> 8) & 0xFF));
+  adns_write_reg(Config1, cpival);
   adns_com_end();
 
   Serial.print("Got ");
   Serial.println(cpi);
   Serial.print("Set cpi to ");
-  Serial.println(cpival * 50);
+  Serial.println((cpival + 1)*100);
 }
 
 void performStartup(void) {
