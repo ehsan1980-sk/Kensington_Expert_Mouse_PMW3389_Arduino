@@ -396,8 +396,8 @@ void loop() {
     int x = xh<<8 | xl;
     int y = yh<<8 | yl;
 
-    dx -= y;
-    dy -= x;
+    dx += y;
+    dy += x;
       
     adns_com_end();
 
