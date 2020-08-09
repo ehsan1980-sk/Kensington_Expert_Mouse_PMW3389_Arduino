@@ -26,10 +26,10 @@
 
 //Set this to a pin your buttons are attached
 #define NUMBTN   4
-#define Btn1_Pin 3  // left button
-#define Btn2_Pin 0  // right button
-#define Btn4_Pin 2  // middle button
-#define Btn8_Pin 1  // back button
+#define Btn1_Pin 3  // right button
+#define Btn2_Pin 0  // back button
+#define Btn4_Pin 2  // forward button
+#define Btn8_Pin 1  // left button
 
 // Registers
 #define Product_ID  0x00
@@ -88,7 +88,7 @@ const int reset = 8; // Optional
 int Btn_pins[NUMBTN] = { Btn1_Pin, Btn2_Pin, Btn4_Pin, Btn8_Pin };
 bool Btns[NUMBTN] = {false, false, false, false};      // button state indicator
 uint8_t Btn_buffers[NUMBTN] = {0xFF, 0xFF, 0xFF, 0xFF}; // button debounce buffer
-char Btn_keys[NUMBTN] = { MOUSE_LEFT, MOUSE_RIGHT, MOUSE_MIDDLE, MOUSE_BACK };
+char Btn_keys[NUMBTN] = { MOUSE_RIGHT, MOUSE_BACK, MOUSE_FORWARD, MOUSE_LEFT };
 
 unsigned long Cpis[NUMCPI] = { 400, 800, 1200, 1600 };
 struct CpiUpdater {
@@ -299,7 +299,7 @@ void check_button_state()
   }
 
   // CPI switcher
-  if (Btns[1] /* MOUSE_RIGHT */ == true && Btns[2] /* MOUSE_MIDDLE */ == true) {
+  if (Btns[1] /* MOUSE_BACK */ == true && Btns[2] /* MOUSE_FORWARD */ == true) {
     if (CpiUpdate.target_set != true) {
       CpiUpdate.target_cpi_index = (CpiUpdate.target_cpi_index + 1) % NUMCPI;
       CpiUpdate.target_set = true;
