@@ -1,5 +1,5 @@
 # PMW3389
-Interfacing PixArt PMW3389 with ATMega32u4 based Arduino boards
+Interfacing PixArt PMW3389 with Arduino boards
 
 # Parts info
 * PMW3389 Module: https://www.tindie.com/products/jkicklighter/pmw3389-motion-sensor/ by JACK Enterprises
