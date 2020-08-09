@@ -90,14 +90,14 @@ bool Btns[NUMBTN] = {false, false, false, false};      // button state indicator
 uint8_t Btn_buffers[NUMBTN] = {0xFF, 0xFF, 0xFF, 0xFF}; // button debounce buffer
 char Btn_keys[NUMBTN] = { MOUSE_RIGHT, MOUSE_BACK, MOUSE_FORWARD, MOUSE_LEFT };
 
-unsigned long Cpis[NUMCPI] = { 400, 800, 1200, 1600 };
+unsigned long Cpis[NUMCPI] = { 300, 500, 800, 1200 };
 struct CpiUpdater {
   bool target_set;
   bool updated;
   uint8_t target_cpi_index;
 };
 
-CpiUpdater CpiUpdate = {false, false, 1}; // Default Cpis[1] = 800
+CpiUpdater CpiUpdate = {false, false, 0}; // Default Cpis[0] = 300
 
 byte initComplete = 0;
 bool inBurst = false;   // in busrt mode
