@@ -60,7 +60,7 @@
 // Configurations
 // The default CPI value should be in between 100 -- 12000
 #define CPI       800
-#define DEBOUNCE  10   //unit = ms.
+#define DEBOUNCE  2   //unit = ms.
 #define NUMCPI 4
 #define NUMBTNMAP 4
 #define MiddleEmulationTimeout 50 //unit = ms.
