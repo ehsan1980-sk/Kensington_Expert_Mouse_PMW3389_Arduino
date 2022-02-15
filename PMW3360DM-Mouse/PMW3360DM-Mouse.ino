@@ -11,11 +11,13 @@
   #define MOUSE_BEGIN       AdvMouse.begin()
   #define MOUSE_PRESS(x)    AdvMouse.press_(x)
   #define MOUSE_RELEASE(x)  AdvMouse.release_(x)
+  #define MOUSE_CLICK(x)    AdvMouse.click(x)
 #else
   #include <Mouse.h>
   #define MOUSE_BEGIN       Mouse.begin()
   #define MOUSE_PRESS(x)    Mouse.press(x)
   #define MOUSE_RELEASE(x)  Mouse.release(x)
+  #define MOUSE_CLICK(x)    Mouse.click(x)
 #endif
 
 // Configurations
@@ -23,6 +25,10 @@
 #define CPI       800
 #define DEBOUNCE  10   //unit = ms.
 #define NUMCPI 4
+#define NUMBTNMAP 4
+#define MiddleEmulationTimeout 50 //unit = ms.
+#define ScrollEmulationVerticalThreshold 50
+#define ScrollEmulationHorizontalThreshold 200
 
 #define DEBOUNCE_DEFER 0
 #define DEBOUNCE_EAGER 1
@@ -94,16 +100,48 @@ const int reset = 8; // Optional
 int Btn_pins[NUMBTN] = { Btn1_Pin, Btn2_Pin, Btn4_Pin, Btn8_Pin };
 bool Btns[NUMBTN] = {false, false, false, false};      // button state indicator
 uint8_t Btn_buffers[NUMBTN] = {0xFF, 0xFF, 0xFF, 0xFF}; // button debounce buffer
-char Btn_keys[NUMBTN] = { MOUSE_RIGHT, MOUSE_BACK, MOUSE_FORWARD, MOUSE_LEFT };
+// Final 2 characters in each map indicates middle button emulation enable & scroll emulation enable
+char Btn_keys[NUMBTNMAP][NUMBTN + 2] = {{ MOUSE_RIGHT, MOUSE_BACK, MOUSE_FORWARD, MOUSE_LEFT, false, false },
+                                        { MOUSE_LEFT, MOUSE_BACK, MOUSE_FORWARD, MOUSE_RIGHT, false, false },
+                                        { MOUSE_RIGHT, MOUSE_BACK, MOUSE_FORWARD, MOUSE_LEFT, true, true },
+                                        { MOUSE_LEFT, MOUSE_BACK, MOUSE_FORWARD, MOUSE_RIGHT, true, true }};
 
 unsigned long Cpis[NUMCPI] = { 300, 500, 800, 1200 };
-struct CpiUpdater {
+struct StateChanger {
   bool target_set;
   bool updated;
-  uint8_t target_cpi_index;
+  uint8_t index;
+};
+enum MiddleEmulationState {
+  MiddleEmulation_INACTIVE,
+  MiddleEmulation_DETECTING,  // Left or right click detected, waiting for the other one
+  MiddleEmulation_DETECTED,   // Left & right buttons both clicked within timeout
+  MiddleEmulation_TIMEOUT,    // Single click timed out, pass click through
+  MiddleEmulation_RELEASING,  // Left or right button release after successful emulation
+};
+struct MiddleEmulation {
+  unsigned long click_time;
+  char click_button;
+  enum MiddleEmulationState state;
+  bool enabled;
+};
+enum ScrollEmulationState {
+  ScrollEmulation_INACTIVE,
+  ScrollEmulation_DETECTING,
+  ScrollEmulation_SCROLLING,
+};
+struct ScrollEmulation {
+  bool enabled;
+  char click_button;
+  enum ScrollEmulationState state;
+  int dx;
+  int dy;
 };
 
-CpiUpdater CpiUpdate = {false, false, 0}; // Default Cpis[0] = 300
+StateChanger CpiUpdate = {false, false, 0}; // Default Cpis[0] = 300
+StateChanger ButtonMapUpdate = {false, false, 0};
+MiddleEmulation MiddleEmulate = {0, 0, MiddleEmulation_INACTIVE, false};
+ScrollEmulation ScrollEmulate = {false, 0, ScrollEmulation_INACTIVE, 0, 0};
 
 byte initComplete = 0;
 bool inBurst = false;   // in busrt mode
@@ -266,7 +304,7 @@ void performStartup(void) {
   adns_upload_firmware();
   delay(10);
 
-  setCPI(Cpis[CpiUpdate.target_cpi_index]);
+  setCPI(Cpis[CpiUpdate.index]);
   Serial.println("Optical Chip Initialized");
 }
 
@@ -276,6 +314,14 @@ void check_button_state()
   // runs only after initialization
   if(initComplete != 9)
     return;
+
+  // Middle button emulation timeout check
+  if (MiddleEmulate.enabled && MiddleEmulate.state == MiddleEmulation_DETECTING && 
+      ((curTime - MiddleEmulate.click_time) > (MiddleEmulationTimeout * 1000UL))) {
+    MOUSE_PRESS(MiddleEmulate.click_button);
+    MiddleEmulate.state = MiddleEmulation_TIMEOUT;
+//    Serial.println("Middle Emulate 1 > 3");
+  }
 
   unsigned long elapsed = curTime - lastButtonCheck;
   
@@ -297,7 +343,30 @@ void check_button_state()
     if(!Btns[i] && Btn_buffers[i] == 0x00)  // button press stabilized
 #endif
     {
-      MOUSE_PRESS(Btn_keys[i]);
+      if (MiddleEmulate.enabled || ScrollEmulate.enabled) {
+        if (MiddleEmulate.enabled && MiddleEmulate.state == MiddleEmulation_INACTIVE &&
+            (Btn_keys[ButtonMapUpdate.index][i] == MOUSE_LEFT || Btn_keys[ButtonMapUpdate.index][i] == MOUSE_RIGHT)) {
+            MiddleEmulate.click_time = curTime;
+            MiddleEmulate.click_button = Btn_keys[ButtonMapUpdate.index][i];
+            MiddleEmulate.state = MiddleEmulation_DETECTING;
+//            Serial.println("Middle Emulate 0 > 1");
+        } else if (MiddleEmulate.enabled && MiddleEmulate.state == MiddleEmulation_DETECTING &&
+                   (Btn_keys[ButtonMapUpdate.index][i] == MOUSE_LEFT || Btn_keys[ButtonMapUpdate.index][i] == MOUSE_RIGHT)) {
+          MiddleEmulate.state = MiddleEmulation_DETECTED;
+          MOUSE_PRESS(MOUSE_MIDDLE);
+//          Serial.println("Middle Emulate 1 > 2");
+        } else if (ScrollEmulate.enabled && ScrollEmulate.state == ScrollEmulation_INACTIVE &&
+                   (Btn_keys[ButtonMapUpdate.index][i] == MOUSE_BACK || Btn_keys[ButtonMapUpdate.index][i] == MOUSE_FORWARD)) {
+          ScrollEmulate.click_button = Btn_keys[ButtonMapUpdate.index][i];
+          ScrollEmulate.dx = 0;
+          ScrollEmulate.dy = 0;
+          ScrollEmulate.state = ScrollEmulation_DETECTING;
+        } else {
+          MOUSE_PRESS(Btn_keys[ButtonMapUpdate.index][i]);
+        }
+      } else {
+        MOUSE_PRESS(Btn_keys[ButtonMapUpdate.index][i]);
+      }
       Btns[i] = true;
     }
 #if DEBOUNCE_RELEASE == DEBOUNCE_EAGER
@@ -308,22 +377,62 @@ void check_button_state()
     else if(Btns[i] && Btn_buffers[i] == 0xFF) // button release stabilized
 #endif
     {
-      MOUSE_RELEASE(Btn_keys[i]);
+      if (MiddleEmulate.enabled || ScrollEmulate.enabled) {
+        if (MiddleEmulate.enabled && MiddleEmulate.state == MiddleEmulation_DETECTING && Btn_keys[ButtonMapUpdate.index][i] == MiddleEmulate.click_button) {
+          MOUSE_CLICK(MiddleEmulate.click_button);
+          MiddleEmulate.click_time = 0;
+          MiddleEmulate.state = MiddleEmulation_INACTIVE;
+//          Serial.println("Middle Emulate 1 > 0");
+        } else if (MiddleEmulate.enabled && MiddleEmulate.state == MiddleEmulation_TIMEOUT && Btn_keys[ButtonMapUpdate.index][i] == MiddleEmulate.click_button) {
+          MOUSE_RELEASE(MiddleEmulate.click_button);
+          MiddleEmulate.click_time = 0;
+          MiddleEmulate.state = MiddleEmulation_INACTIVE;
+//          Serial.println("Middle Emulate 3 > 0");
+        } else if (MiddleEmulate.enabled && MiddleEmulate.state == MiddleEmulation_DETECTED &&
+                   (Btn_keys[ButtonMapUpdate.index][i] == MOUSE_LEFT || Btn_keys[ButtonMapUpdate.index][i] == MOUSE_RIGHT)) {
+          MOUSE_RELEASE(MOUSE_MIDDLE);
+          MiddleEmulate.click_button = Btn_keys[ButtonMapUpdate.index][i] == MOUSE_LEFT ? MOUSE_RIGHT : MOUSE_LEFT;
+          MiddleEmulate.state = MiddleEmulation_RELEASING;
+//          Serial.println("Middle Emulate 2 > 4");
+        } else if (MiddleEmulate.enabled && MiddleEmulate.state == MiddleEmulation_RELEASING && Btn_keys[ButtonMapUpdate.index][i] == MiddleEmulate.click_button) {
+          MiddleEmulate.click_time = 0;
+          MiddleEmulate.state = MiddleEmulation_INACTIVE;
+//          Serial.println("Middle Emulate 4 > 0");
+        } else if (ScrollEmulate.enabled && ScrollEmulate.state != ScrollEmulation_INACTIVE &&
+                   ScrollEmulate.click_button == Btn_keys[ButtonMapUpdate.index][i]) {
+          if (ScrollEmulate.state == ScrollEmulation_DETECTING) {
+            MOUSE_CLICK(ScrollEmulate.click_button);
+          }
+          ScrollEmulate.state = ScrollEmulation_INACTIVE;
+        } else {
+          MOUSE_RELEASE(Btn_keys[ButtonMapUpdate.index][i]);
+        }
+      } else {
+        MOUSE_RELEASE(Btn_keys[ButtonMapUpdate.index][i]);
+      }
       Btns[i] = false;
     }
     
   }
 
+  if (Btns[0] == true && Btns[1] == true && Btns[2] == true && Btns[3] == true) {
+    if (ButtonMapUpdate.target_set != true) {
+      ButtonMapUpdate.target_set = true;
+      ButtonMapUpdate.updated = false;
+    }
+  }
   // CPI switcher
-  if (Btns[1] /* MOUSE_BACK */ == true && Btns[2] /* MOUSE_FORWARD */ == true) {
+  else if (Btns[1] /* MOUSE_BACK */ == true && Btns[2] /* MOUSE_FORWARD */ == true) {
     if (CpiUpdate.target_set != true) {
-      CpiUpdate.target_cpi_index = (CpiUpdate.target_cpi_index + 1) % NUMCPI;
+      CpiUpdate.index = (CpiUpdate.index + 1) % NUMCPI;
       CpiUpdate.target_set = true;
       CpiUpdate.updated = false;
     }
   } else {
     CpiUpdate.target_set = false;
     CpiUpdate.updated = false;
+    ButtonMapUpdate.target_set = false;
+    ButtonMapUpdate.updated = false;
   }
 }
 
@@ -432,8 +541,30 @@ void loop() {
     {
       signed char mdx = constrain(dx, -127, 127);
       signed char mdy = constrain(dy, -127, 127);
-      
-      Mouse.move(mdx, mdy, 0);
+
+      if (ScrollEmulate.enabled) {
+        int vertical_scroll = 0, horizontal_scroll = 0;
+        if (ScrollEmulate.state == ScrollEmulation_DETECTING && (mdx != 0 || mdy != 0)) {
+          ScrollEmulate.state = ScrollEmulation_SCROLLING;
+        }
+        if (ScrollEmulate.state == ScrollEmulation_SCROLLING) {
+          ScrollEmulate.dx += mdx;
+          ScrollEmulate.dy += mdy;
+          if (abs(ScrollEmulate.dy) > ScrollEmulationVerticalThreshold) {
+            vertical_scroll = ScrollEmulate.dy / ScrollEmulationVerticalThreshold;
+            ScrollEmulate.dy -= vertical_scroll * ScrollEmulationVerticalThreshold;
+          }
+          if (abs(ScrollEmulate.dx) > ScrollEmulationHorizontalThreshold) {
+            horizontal_scroll = ScrollEmulate.dx / ScrollEmulationHorizontalThreshold;
+            ScrollEmulate.dx -= horizontal_scroll * ScrollEmulationHorizontalThreshold;
+          }
+          Mouse.scroll(-vertical_scroll, horizontal_scroll);
+        } else {
+          Mouse.move(mdx, mdy, 0);
+        }
+      } else {
+        Mouse.move(mdx, mdy, 0);
+      }
       
       dx = 0;
       dy = 0;
@@ -450,8 +581,16 @@ void loop() {
 
   // update CPI cycled from button combo
   if (CpiUpdate.target_set == true && CpiUpdate.updated == false) {
-    setCPI(Cpis[CpiUpdate.target_cpi_index]);
+    setCPI(Cpis[CpiUpdate.index]);
     CpiUpdate.updated = true;
+  }
+  if (ButtonMapUpdate.target_set == true && ButtonMapUpdate.updated == false) {
+    ButtonMapUpdate.index = (ButtonMapUpdate.index + 1) % NUMBTNMAP;
+    MiddleEmulate.enabled = Btn_keys[ButtonMapUpdate.index][NUMBTN];
+    ScrollEmulate.enabled = Btn_keys[ButtonMapUpdate.index][NUMBTN+1];
+    ButtonMapUpdate.updated = true;
+    Serial.print("Set button map to index ");
+    Serial.println(ButtonMapUpdate.index);
   }
 
   // command process routine
