@@ -1,7 +1,44 @@
 // Uncomment this line to activate an advanced mouse mode
 // Need to install AdvMouse library (copy /library/AdvMouse to the Arduino libraries)
+// Don't need this for Teensy
 //#define ADVANCE_MODE
 
+// For Teensy, edit Arduino/hardware/teensy/avr/teensy3/usb_desc.h
+// to remove keyboard & joystick if they interfere with old games
+// @@ -178,6 +178,7 @@
+//    #define PRODUCT_ID           0x0482
+//    #define MANUFACTURER_NAME    {'T','e','e','n','s','y','d','u','i','n','o'}
+//    #define MANUFACTURER_NAME_LEN        11
+// +  #if 0
+//    #define PRODUCT_NAME         {'K','e','y','b','o','a','r','d','/','M','o','u','s','e','/','J','o','y','s','t','i','c','k'}
+//    #define PRODUCT_NAME_LEN     23
+//    #define EP0_SIZE             64
+// @@ -207,6 +208,25 @@
+//    #define JOYSTICK_ENDPOINT     4
+//    #define JOYSTICK_SIZE         12     //  12 = normal, 64 = extreme joystick
+//    #define JOYSTICK_INTERVAL     2
+// +  #else
+// +  #define PRODUCT_NAME         {'T','r','a','c','k','m','a','n',' ','M','a','r','b','l','e',' ','P','M','W','3','3','6','0'}
+// +  #define PRODUCT_NAME_LEN     23
+// +  #define EP0_SIZE             64
+// +  #define NUM_ENDPOINTS         3
+// +  #define NUM_USB_BUFFERS      24
+// +  #define NUM_INTERFACE                2
+// +  #define SEREMU_INTERFACE      0      // Serial emulation
+// +  #define SEREMU_TX_ENDPOINT    1
+// +  #define SEREMU_TX_SIZE        64
+// +  #define SEREMU_TX_INTERVAL    1
+// +  #define SEREMU_RX_ENDPOINT    2
+// +  #define SEREMU_RX_SIZE        32
+// +  #define SEREMU_RX_INTERVAL    2
+// +  #define MOUSE_INTERFACE       1      // Mouse
+// +  #define MOUSE_ENDPOINT        3
+// +  #define MOUSE_SIZE            8
+// +  #define MOUSE_INTERVAL        1
+// +  #endif
+//    #define ENDPOINT1_CONFIG     ENDPOINT_TRANSMIT_ONLY
+//    #define ENDPOINT2_CONFIG     ENDPOINT_RECEIVE_ONLY
+//    #define ENDPOINT3_CONFIG     ENDPOINT_TRANSMIT_ONLY
 
 #include <SPI.h>
 #include <avr/pgmspace.h>
