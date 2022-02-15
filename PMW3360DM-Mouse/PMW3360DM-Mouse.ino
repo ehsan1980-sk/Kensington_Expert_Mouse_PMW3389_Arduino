@@ -24,6 +24,12 @@
 #define DEBOUNCE  10   //unit = ms.
 #define NUMCPI 4
 
+#define DEBOUNCE_DEFER 0
+#define DEBOUNCE_EAGER 1
+
+#define DEBOUNCE_PRESS DEBOUNCE_DEFER
+#define DEBOUNCE_RELEASE DEBOUNCE_DEFER
+
 //Set this to a pin your buttons are attached
 #define NUMBTN   4
 #define Btn1_Pin 3  // right button
@@ -285,12 +291,22 @@ void check_button_state()
     int btn_state = digitalRead(Btn_pins[i]);
     Btn_buffers[i] = Btn_buffers[i] << 1 | btn_state; 
 
+#if DEBOUNCE_PRESS == DEBOUNCE_EAGER
+    if(!Btns[i] && Btn_buffers[i] == 0xFE)  // button pressed for the first time
+#else
     if(!Btns[i] && Btn_buffers[i] == 0x00)  // button press stabilized
+#endif
     {
       MOUSE_PRESS(Btn_keys[i]);
       Btns[i] = true;
     }
+#if DEBOUNCE_RELEASE == DEBOUNCE_EAGER
+    else if( (Btns[i] && Btn_buffers[i] == 0x01) // button released after stabilized press
+            // force release when consequent off state (for the DEBOUNCE time) is detected
+            || (Btns[i] && Btn_buffers[i] == 0xFF) )
+#else
     else if(Btns[i] && Btn_buffers[i] == 0xFF) // button release stabilized
+#endif
     {
       MOUSE_RELEASE(Btn_keys[i]);
       Btns[i] = false;
