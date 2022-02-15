@@ -44,6 +44,9 @@ Interfacing PixArt PMW3360 with Arduino boards
   * Fully functional trackball (w. 1k polling rate) with four buttons (left, right, middle, back)
   * Default CPI and debounce time can be set (see #define sections in the source code)
   * Cycle through CPI with button combo (back + forward)
+  * Cycle through button mapping with button combo (back + forward + left + right)
+  * Middle click emulation (left + right)
+  * Scroll emulation (back or forward + horizontal or vertical ball movement)
   * Commands (newline (\n) should be placed at the end of each command)
     * Q: toggle surface quality report (can be seen thorugh Serial Monitor or Serial Plotter)
     * I: print device signature
