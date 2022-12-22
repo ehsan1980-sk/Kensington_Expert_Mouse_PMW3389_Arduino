@@ -43,6 +43,8 @@
 #include <SPI.h>
 #include <avr/pgmspace.h>
 
+extern volatile uint8_t usb_sleep;
+
 #ifdef ADVANCE_MODE 
   #include <AdvMouse.h>
   #define MOUSE_BEGIN       AdvMouse.begin()
@@ -506,6 +508,41 @@ void loop() {
   unsigned long elapsed = curTime - lastTS;
 
   check_button_state();
+
+#if 1
+  // usb_isr eats up sleep interrupt, had to add a global variable to track sleep state
+  // For Teensy, edit Arduino/hardware/teensy/avr/teensy3/usb_dev.c
+  // --- usb_dev.c.backup    2020-03-26 00:29:54.735107400 -0700
+  // +++ usb_dev.c   2022-02-17 16:35:36.093146200 -0800
+  // @@ -144,6 +144,7 @@
+  //
+  //  volatile uint8_t usb_configuration = 0;
+  //  volatile uint8_t usb_reboot_timer = 0;
+  // +volatile uint8_t usb_sleep = 0;
+  //
+  //
+  //  static void endpoint0_stall(void)
+  // @@ -1103,6 +1104,11 @@
+  //         if ((status & USB_ISTAT_SLEEP /* 10 */ )) {
+  //                 //serial_print("sleep\n");
+  //                 USB0_ISTAT = USB_ISTAT_SLEEP;
+  // +               usb_sleep = 1;
+  // +       }
+  // +       else
+  // +       {
+  // +               usb_sleep = 0;
+  //         }
+  //
+  //  }
+  if(usb_sleep && (Btns[0] || Btns[1] || Btns[2] || Btns[3]))
+  {
+    // from https://forum.pjrc.com/threads/26649-I-woke-my-Mac-from-sleep-with-a-teensy-3-0
+    uint8_t tmp = USB0_CTL;
+    USB0_CTL |= USB_CTL_RESUME;
+    delay(12);
+    USB0_CTL = tmp;
+  }
+#endif
 
   if(!inBurst)
   {
