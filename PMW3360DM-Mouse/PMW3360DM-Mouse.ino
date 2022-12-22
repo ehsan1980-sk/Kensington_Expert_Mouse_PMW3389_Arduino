@@ -72,7 +72,7 @@ extern volatile uint8_t usb_sleep;
 #define DEBOUNCE_DEFER 0
 #define DEBOUNCE_EAGER 1
 
-#define DEBOUNCE_PRESS DEBOUNCE_DEFER
+#define DEBOUNCE_PRESS DEBOUNCE_EAGER
 #define DEBOUNCE_RELEASE DEBOUNCE_DEFER
 
 //Set this to a pin your buttons are attached
@@ -145,7 +145,7 @@ char Btn_keys[NUMBTNMAP][NUMBTN + 2] = {{ MOUSE_RIGHT, MOUSE_BACK, MOUSE_FORWARD
                                         { MOUSE_RIGHT, MOUSE_BACK, MOUSE_FORWARD, MOUSE_LEFT, true, true },
                                         { MOUSE_LEFT, MOUSE_BACK, MOUSE_FORWARD, MOUSE_RIGHT, true, true }};
 
-unsigned long Cpis[NUMCPI] = { 300, 500, 800, 1200 };
+unsigned long Cpis[NUMCPI] = { 300, 500, 800, 1000 };
 struct StateChanger {
   bool target_set;
   bool updated;
