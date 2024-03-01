@@ -3,8 +3,8 @@ This code is for a custom 3D printed mouse that utilizes the PMW3389 sensor.
 The video about this project can be found here: https://youtu.be/qmX8vL-GbxU
 
 # Parts info
-* PMW3389 Module: https://www.tindie.com/products/citizenjoe/pmw3389-module.jpg/
-  * <img src="img/tindie_sensor_image.jpg" width="200" alt="PMW3360 Module Image">
+* PMW3389 Module: https://www.tindie.com/products/citizenjoe/pmw3389-motion-sensor/
+  * <img src="img/pmw3389-module.jpg" width="200" alt="PMW3360 Module Image">
 * Original version of this code: https://github.com/dkao/Kensington_Expert_Mouse_PMW3389_Arduino by dkao
 * Base source code: https://github.com/mrjohnk/PMW3389DM by mrjohnk
 * Arduino Pro Micro
