@@ -21,16 +21,14 @@ The video about this project can be found here: https://youtu.be/qmX8vL-GbxU
 
 # Sketch Descriptions
 * PMW3389DM-Mouse/
-  * Fully functional trackball (w. 1k polling rate) with four buttons (left, right, middle, back)
+  * Mouse with  high polling rate and 4 mian buttons: Left, Right, Middle, Back, plus 2 user-definable Keyboard buttons
   * Default CPI and debounce time can be set (see #define sections in the source code)
-  * Cycle through CPI with button combo (middle + right click)
-  * Commands (newline (\n) should be placed at the end of each command)
-    * Q: toggle surface quality report (can be seen thorugh Serial Monitor or Serial Plotter)
-    * I: print device signature
-    * C[number]: Set cpi level, example) C1600\n   = set CPI to 1600.
+  * Cycle through CPI with button combo (back + right click), LED will update to show which mode is selected
 
 # How to use
   * Build the circuit as described.
   * (Arduino only) Copy the /library/AdvMouse/ to your Arduino library folder
   * Load PMW3389DM-Mouse on Arduino IDE.
-    * Modify dx, dy for your sensor orientation
+    * Change dx, dy to positive values if input is reversed
+  * Upload code to Arduino
+  * Enjoy!
