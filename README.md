@@ -14,6 +14,8 @@ The video about this project can be found here: https://youtu.be/qmX8vL-GbxU
 * (1) Rotary encoder - model PEC12R-4220F-S0024: https://www.digikey.com/en/products/detail/bourns-inc/PEC12R-4220F-S0024/4499653
 * (10) 10K Resistors
 * (2) 0.1uF Capacitors
+* (2) 1x8 Female headers
+* (2) 1x12 Female headers
 * Fine guage wire
 
 # Sensor module pinout
