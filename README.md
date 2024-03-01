@@ -15,12 +15,15 @@ The video about this project can be found here: https://youtu.be/qmX8vL-GbxU
 * (6) Switches (Kailh Choc): https://www.amazon.com/KAILH-Official-Chocolate-Mechanical-Keyboard/dp/B0B3MLZJ8K?th=1
 * (6) Keycaps (Kailh Choc): https://chosfox.com/collections/low-profile-keycaps/products/chocfox-cfx-choc-keycaps
 * (1) Rotary encoder - model PEC12R-4220F-S0024: https://www.digikey.com/en/products/detail/bourns-inc/PEC12R-4220F-S0024/4499653
+* (1) Rotary Encoder knob: https://www.adafruit.com/product/5528
 * (1) Neopixel RGBW LED: https://www.adafruit.com/product/4776
 * (10) 10K Resistors
 * (2) 0.1uF Capacitors
 * (2) 1x8 Female headers
 * (2) 1x12 Female headers
 * Fine guage wire
+* Mouse glides: https://www.amazon.com/dp/B07TLK4956
+* USB-micro cable (can use any, but I like this one): https://www.amazon.com/dp/B018RAVXU0
 
 # Sensor module pinout
 * MI = MISO
