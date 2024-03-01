@@ -13,7 +13,9 @@ The video about this project can be found here: https://youtu.be/qmX8vL-GbxU
   * <img src="img/pmw3389-module.jpg" width="200" alt="PMW3360 Module Image">
 * (1) Arduino Pro Micro
 * (6) Switches (Kailh Choc): https://www.amazon.com/KAILH-Official-Chocolate-Mechanical-Keyboard/dp/B0B3MLZJ8K?th=1
+* (6) Keycaps (Kailh Choc): https://chosfox.com/collections/low-profile-keycaps/products/chocfox-cfx-choc-keycaps
 * (1) Rotary encoder - model PEC12R-4220F-S0024: https://www.digikey.com/en/products/detail/bourns-inc/PEC12R-4220F-S0024/4499653
+* (1) Neopixel RGBW LED: https://www.adafruit.com/product/4776
 * (10) 10K Resistors
 * (2) 0.1uF Capacitors
 * (2) 1x8 Female headers
