@@ -40,6 +40,9 @@ The video about this project can be found here: https://youtu.be/qmX8vL-GbxU
   * Mouse with  high polling rate and 4 main buttons: Left, Right, Middle, Back, plus 2 user-definable Keyboard buttons
   * Default CPI and debounce time can be set (see #define sections in the source code)
   * Cycle through CPI with button combo (back + right click), LED will update to show which mode is selected
+ 
+# 3D Models
+*Check the 3D_models folder
 
 # How to use
   * Build the circuit as described.
