@@ -25,6 +25,9 @@ The video about this project can be found here: https://youtu.be/qmX8vL-GbxU
 * Mouse glides: https://www.amazon.com/dp/B07TLK4956
 * USB-micro cable (can use any, but I like this one): https://www.amazon.com/dp/B018RAVXU0
 
+#
+* Schematic/PCB files coming soon. I will get these added as soon as I can. 
+
 # Sensor module pinout
 * MI = MISO
 * MO = MOSI
@@ -42,7 +45,7 @@ The video about this project can be found here: https://youtu.be/qmX8vL-GbxU
   * Cycle through CPI with button combo (back + right click), LED will update to show which mode is selected
  
 # 3D Models
-*Check the 3D_models folder
+* Check the 3D_models folder
 
 # How to use
   * Build the circuit as described.
