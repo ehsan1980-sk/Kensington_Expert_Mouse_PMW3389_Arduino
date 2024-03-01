@@ -1,3 +1,5 @@
+<img src="img/mouse-header.jpg" width="200" alt="PMW3360 Module Image">
+
 # PMW3389 Mouse
 This code is for a custom 3D printed mouse that utilizes the PMW3389 sensor.
 The video about this project can be found here: https://youtu.be/qmX8vL-GbxU
