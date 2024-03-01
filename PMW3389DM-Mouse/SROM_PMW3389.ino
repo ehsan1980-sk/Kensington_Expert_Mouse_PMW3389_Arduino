@@ -1,6 +1,11 @@
 // the firmeware that is uploaded in the ADNS each time it boots
 
+#include <SPI.h>
+#if defined(AVR)
 #include <avr/pgmspace.h>
+#else  //defined(AVR)
+#include <pgmspace.h>
+#endif  //defined(AVR)
 
 // Firmware "ORCA3_ROW_SROMxE8" 
 
