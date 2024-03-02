@@ -26,7 +26,7 @@ The video about this project can be found here: https://youtu.be/qmX8vL-GbxU
 * USB-micro cable (can use any, but I like this one): https://www.amazon.com/dp/B018RAVXU0
 
 # Electronics and PCB Schematics
-* Schematic/PCB files coming soon. I will get these added as soon as I can. 
+* Check the respective folders for the KiCad and Gerber files.
 
 # Sensor module pinout
 * MI = MISO
